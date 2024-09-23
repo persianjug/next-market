@@ -3,9 +3,8 @@
 import useAuth from "@/app/utils/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
-const DeleteItem = context => {
+const UpdateItem = context => {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
@@ -16,12 +15,13 @@ const DeleteItem = context => {
   const router = useRouter();
   const loginUserEmail = useAuth();
 
+
   useEffect(() => {
     const getSingleItem = async id => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/item/readsingle/${id}`, { cache: "no-store" });
       const jsonData = await response.json();
       const singleItem = jsonData.singleItem;
-      console.log(`title: ${singleItem.title}`);
+      // console.log(`title: ${singleItem.title}`);
       setTitle(singleItem.title);
       setPrice(singleItem.price);
       setImage(singleItem.image);
@@ -36,14 +36,18 @@ const DeleteItem = context => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/item/delete/${context.params.id}`, {
-        method: "DELETE",
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/item/update/${context.params.id}`, {
+        method: "PUT",
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify({
+          title: title,
+          price: price,
+          image: image,
+          description: description,
           email: loginUserEmail
         })
       });
@@ -52,7 +56,7 @@ const DeleteItem = context => {
       router.push("/");
       router.prefetch();
     } catch (error) {
-      alert("アイテム削除失敗");
+      alert("アイテム編集失敗");
     }
   }
 
@@ -66,16 +70,20 @@ const DeleteItem = context => {
 
   return (
     <div>
-      <h1 className="page-title">アイテム削除</h1>
+      <h1 className="page-title">アイテム編集</h1>
       <form onSubmit={handleSubmit}>
-        <h2>{title}</h2>
-        <Image src={image} width={750} height={500} alt="item-image" priority />
-        <h3>{price}</h3>
-        <p>{description}</p>
-        <button>削除</button>
+        <input type="text" name="title" placeholder="アイテム名" required
+          onChange={e => setTitle(e.target.value)} value={title} />
+        <input type="text" name="price" placeholder="価格" required
+          onChange={e => setPrice(e.target.value)} value={price} />
+        <input type="text" name="image" placeholder="画像" required
+          onChange={e => setImage(e.target.value)} value={image} />
+        <textarea name="description" placeholder="商品説明" required
+          onChange={e => setDescription(e.target.value)} value={description} ></textarea>
+        <button>編集</button>
       </form>
     </div>
   );
 };
 
-export default DeleteItem;
+export default UpdateItem;

@@ -1,5 +1,6 @@
 "use client"
 
+import ImgInput from "@/app/components/imgInput";
 import useAuth from "@/app/utils/useAuth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -45,15 +46,16 @@ const CreateItem = () => {
     return (
       <div className="page-title">
         <h1>アイテム作成</h1>
+        <ImgInput setImage={setImage} />
         <form onSubmit={handleSubmit}>
           <input type="text" name="title" placeholder="アイテム名" required
-            onChange={e => setTitle(e.target.value)} />
+            onChange={e => setTitle(e.target.value)} value={title} />
           <input type="text" name="price" placeholder="価格" required
-            onChange={e => setPrice(e.target.value)} />
+            onChange={e => setPrice(e.target.value)} value={price} />
           <input type="text" name="image" placeholder="画像" required
-            onChange={e => setImage(e.target.value)} />
+            onChange={e => setImage(e.target.value)} value={image} />
           <textarea name="description" placeholder="商品説明" required
-            onChange={e => setDescription(e.target.value)}></textarea>
+            onChange={e => setDescription(e.target.value)} value={description}></textarea>
           <button>作成</button>
         </form>
       </div>

@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 
-const Login = ()  => {
+const Resister = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -9,41 +10,40 @@ const Login = ()  => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/login`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/register`, {
         method: "POST",
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
+          name: name,
           email: email,
           password: password
         })
       });
       const jsonData = await response.json();
-      console.log(jsonData);
-      localStorage.setItem("token", jsonData.token);
       alert(jsonData.message);
     } catch (error) {
-      alert("ログイン失敗");
+      alert("ユーザー登録失敗");
     }
   }
 
 
   return (
     <div>
-      <title>ログインページ</title>
-      <meta name="description" content="ログインページです" />
-      <h1 className="page-title">ログイン</h1>
+      <h1 className="page-title">ユーザー登録</h1>
       <form onSubmit={handleSubmit}>
+        <input type="text" name="name" placeholder="名前" required
+          onChange={e => setName(e.target.value)} />
         <input type="text" name="email" placeholder="メールアドレス" required
           onChange={e => setEmail(e.target.value)} />
         <input type="text" name="password" placeholder="パスワード" required
           onChange={e => setPassword(e.target.value)} />
-        <button>ログイン</button>
+        <button>登録</button>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Resister;
