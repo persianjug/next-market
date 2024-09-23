@@ -7,15 +7,16 @@ export async function POST(request) {
   const reqBody = await request.json();
 
   try {
-    // MongoDB接続
+    // DB接続
     await connectDB();
-    // データ追加
+
+    // ユーザ情報作成
     await UserModel.create(reqBody);
-    // レスポンスを返却
+
+    // ユーザー登録成功時のレスポンス
     return NextResponse.json({message: "ユーザー登録成功"});
-  // DB接続失敗
   } catch {
-    // レスポンスを返却
+    // ユーザー登録失敗時のレスポンス
     return NextResponse.json({message: "ユーザー登録失敗" });
   }
 }

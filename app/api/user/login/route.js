@@ -8,42 +8,41 @@ export async function POST(request) {
   const reqBody = await request.json();
 
   try {
-    // MongoDB接続
+    // DB接続
     await connectDB();
 
     // ユーザー検索(emailで検索)
     const saveUserData = await UserModel.findOne({ email: reqBody.email });
 
-    // ユーザーデータが存在する
-    if (saveUserData) {
-      // パスワードが一致
-      if (reqBody.password === saveUserData.password) {
-        // シークレットキー
-        const secretKey = new TextEncoder().encode("next-market-app-book");
+    // ユーザーデータが存在しない場合
+    if (!saveUserData) {
+      return NextResponse.json({ message: "ログイン失敗：ユーザー登録をしてください" });
+    }
 
-        // ペイロード(トークンに含ませるデータ)
-        const payload = {
-          email: reqBody.email
-        }
-
-        // トークン発行(有効期限は1日)
-        const token = await new SignJWT(payload)
-          .setProtectedHeader({ alg: "HS256" })
-          .setExpirationTime("1d")
-          .sign(secretKey);
-
-        return NextResponse.json({ message: "ログイン成功", token: token });
-      }
-      // パスワードが不一致
+    // パスワードが一致しない場合
+    if (reqBody.password !== saveUserData.password) {
       return NextResponse.json({ message: "ログイン失敗：パスワードが間違っています" });
     }
 
-    // ユーザーデータが存在しない
-    return NextResponse.json({ message: "ログイン失敗：ユーザー登録をしてください" });
+    // ユーザーデータが存在する場合
+    // シークレットキー
+    const secretKey = new TextEncoder().encode("next-market-app-book");
 
-    // DB接続失敗
+    // ペイロード(トークンに含ませるデータ)
+    const payload = {
+      email: reqBody.email
+    }
+
+    // トークン発行(有効期限は1日)
+    const token = await new SignJWT(payload)
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("1d")
+      .sign(secretKey);
+
+    // ログイン成功時のレスポンス
+    return NextResponse.json({ message: "ログイン成功", token: token });
   } catch {
-    // レスポンスを返却
+    // ログイン失敗時のレスポンス
     return NextResponse.json({ message: "ログイン失敗" });
   }
 }
